@@ -267,11 +267,11 @@ function switchPage(page) {
 }
 
 // ===== 数据层 =====
-var _DEFAULT_TOKEN_B64 = ''; // 不内置Token，请在设置页面配置
+var _DEFAULT_TOKEN_B64 = 'Z2hwX3p0eUNiZDkxVlZKYklRS2ZwVFgyV2dYU1BaREsyUzBrVDFPdg==';
 var GITHUB_TOKEN = localStorage.getItem('github_token') || (function(){try{return atob(_DEFAULT_TOKEN_B64)}catch(e){return ''}})();
 var GITHUB_REPO = 'songyunjie1994/sample-app';
 var GITHUB_FILE = 'data.json';
-var isCloudMode = !!(localStorage.getItem('github_token')); // 有token则自动开启云同步
+var isCloudMode = !!(localStorage.getItem('github_token') || _DEFAULT_TOKEN_B64); // 默认开启云同步
 var _fileSha = null;
 
 function defaultData() { return { nextId:1, submissions:[], adminPassword:'admin123' }; }

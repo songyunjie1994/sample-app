@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -83,21 +83,18 @@ select.form-control{-webkit-appearance:auto;appearance:auto}
 .export-area{width:100%;min-height:100px;font-size:12px;font-family:monospace;padding:8px;border:1px solid var(--border);border-radius:8px;margin-top:8px;background:var(--bg);color:var(--text)}
 .hidden{display:none!important}
 .badge{display:inline-block;font-size:11px;background:rgba(255,255,255,.2);padding:1px 8px;border-radius:10px;vertical-align:middle;font-weight:400}
-.sync-status{font-size:12px;color:var(--text2);text-align:center;margin-bottom:8px;padding:4px;background:#f8fafc;border-radius:8px}
 @media(min-width:768px){.header{padding:40px 20px 32px}.header h1{font-size:28px}.container{max-width:520px;padding:24px}.card{padding:28px}}
 </style>
 </head>
 <body>
 <div id="toast" class="toast"></div>
 
-<!-- ===== 用户提交页面 ===== -->
 <div id="pageUser">
 <div class="header">
 <h1>📦 寄样申请 <span class="badge" id="modeBadge" style="display:none"></span></h1>
 <p>填写信息提交样品申请</p>
 </div>
 <div class="container">
-<div id="syncStatus" class="sync-status hidden"></div>
 <div id="formView">
 <div class="card">
 <form id="submitForm">
@@ -183,7 +180,6 @@ select.form-control{-webkit-appearance:auto;appearance:auto}
 </div>
 </div>
 
-<!-- ===== 管理页面 ===== -->
 <div id="pageAdmin" class="hidden">
 <div id="loginView" class="login-wrap">
 <div class="login-box">
@@ -203,7 +199,6 @@ select.form-control{-webkit-appearance:auto;appearance:auto}
 <div><button class="btn btn-sm btn-outline" onclick="showSettings()" style="background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4);color:#fff;width:auto;margin-right:6px">⚙️</button><button class="btn btn-sm btn-outline" onclick="logout()" style="background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4);color:#fff;width:auto">退出</button></div>
 </div>
 <div class="container-wide">
-<div id="syncStatusAdmin" class="sync-status hidden"></div>
 <div class="stats">
 <div class="stat-item pending"><div class="num" id="sPending">0</div><div class="lbl">待审核</div></div>
 <div class="stat-item approved"><div class="num" id="sApproved">0</div><div class="lbl">已通过</div></div>
@@ -232,17 +227,17 @@ select.form-control{-webkit-appearance:auto;appearance:auto}
 </div>
 </div>
 
-<!-- ===== 设置弹窗 ===== -->
 <div id="settingsModal" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;display:none;align-items:center;justify-content:center;padding:20px">
 <div style="background:var(--card);border-radius:var(--radius);max-width:420px;width:100%;max-height:80vh;overflow-y:auto;padding:24px 20px">
 <h3 style="margin-bottom:16px">⚙️ 设置</h3>
 <div class="setting-item"><span class="label">🔑 管理密码</span><div class="setting-right"><input type="text" class="form-control" id="setPassword" style="width:140px;padding:6px 10px;font-size:14px"><button class="btn btn-sm btn-primary" onclick="savePassword()" style="width:auto;margin-top:4px">保存</button></div></div>
 <div style="margin:16px 0;border-top:2px solid var(--primary);padding-top:12px">
-<h4 style="font-size:15px;margin-bottom:8px">☁️ GitHub 云同步设置</h4>
-<p style="font-size:12px;color:var(--text2);margin-bottom:10px">数据通过 GitHub API 存储在仓库中，<strong>完全免费不限量</strong>。</p>
-<div class="setting-item"><span class="label">🔑 GitHub Token</span><div class="setting-right"><input type="text" class="form-control" id="githubToken" style="width:220px;padding:6px 10px;font-size:13px" placeholder="粘贴 GitHub Token"></div></div>
-<div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-sm btn-primary" onclick="saveGithub()" style="width:auto">保存</button><button class="btn btn-sm btn-outline" onclick="clearGithub()" style="width:auto">清除</button></div>
-<div id="githubStatus" style="font-size:12px;color:var(--text2);margin-top:6px"></div>
+<h4 style="font-size:15px;margin-bottom:8px">☁️ Supabase 云同步</h4>
+<p style="font-size:12px;color:var(--text2);margin-bottom:10px">数据通过 Supabase 存储在云端，<strong>完全免费不限量</strong>。</p>
+<div class="setting-item"><span class="label">🔗 Project URL</span><div class="setting-right"><input type="text" class="form-control" id="sbUrl" style="width:220px;padding:6px 10px;font-size:12px" placeholder="https://xxx.supabase.co"></div></div>
+<div class="setting-item"><span class="label">🔑 Anon Key</span><div class="setting-right"><input type="text" class="form-control" id="sbKey" style="width:220px;padding:6px 10px;font-size:12px" placeholder="anon public key"></div></div>
+<div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-sm btn-primary" onclick="saveSupabase()" style="width:auto">保存</button><button class="btn btn-sm btn-outline" onclick="clearSupabase()" style="width:auto">清除</button></div>
+<div id="sbStatus" style="font-size:12px;color:var(--text2);margin-top:6px"></div>
 </div>
 <div class="setting-item"><span class="label">📊 导出数据</span><button class="btn btn-sm btn-primary" onclick="exportData()" style="width:auto">导出</button></div>
 <div class="setting-item" style="border-bottom:none"><span class="label">📥 导入数据</span><div><button class="btn btn-sm btn-outline" onclick="document.getElementById('importFile').click()" style="width:auto">选择文件</button><input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"></div></div>
@@ -257,403 +252,66 @@ select.form-control{-webkit-appearance:auto;appearance:auto}
 </div>
 
 <script>
-// ===== 页面切换 =====
-function switchPage(page) {
-  if (page === 'admin') { checkLogin(); return; }
-  document.getElementById('pageUser').classList.remove('hidden');
-  document.getElementById('pageAdmin').classList.add('hidden');
-  document.getElementById('navUser').classList.add('active');
-  document.getElementById('navAdmin').classList.remove('active');
-}
+function switchPage(p){if(p==='admin'){checkLogin();return}document.getElementById('pageUser').classList.remove('hidden');document.getElementById('pageAdmin').classList.add('hidden');document.getElementById('navUser').classList.add('active');document.getElementById('navAdmin').classList.remove('active')}
+var SUPABASE_URL=localStorage.getItem('supabase_url')||'',SUPABASE_KEY=localStorage.getItem('supabase_key')||'',isCloudMode=!!(SUPABASE_URL&&SUPABASE_KEY),data={nextId:1,submissions:[],adminPassword:'admin123'},_sbTimer=null;
+try{var l=localStorage.getItem('sampleData');if(l)data=JSON.parse(l)}catch(e){}
+async function sbLoad(){try{if(!isCloudMode)return null;var r=await fetch(SUPABASE_URL+'/rest/v1/app_data?select=data&id=eq.1',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}});if(!r.ok)return null;var j=await r.json();return j[0]&&j[0].data||null}catch(e){return null}}
+async function sbSave(d){try{if(!isCloudMode)return;await fetch(SUPABASE_URL+'/rest/v1/app_data?id=eq.1',{method:'PATCH',headers:{'Content-Type':'application/json',apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,Prefer:'return=minimal'},body:JSON.stringify({data:d})})}catch(e){}}
+async function initData(){if(isCloudMode){var cd=await sbLoad();if(cd&&cd.submissions){data=cd;showBadge('☁️ 云同步');return}try{var l=localStorage.getItem('sampleData');if(l){data=JSON.parse(l);if(data.submissions&&data.submissions.length>0)await sbSave(data)}}catch(e){}}showBadge(isCloudMode?'☁️ 云同步':'💻 本地')}
+function saveData(d){data=d;localStorage.setItem('sampleData',JSON.stringify(d));if(isCloudMode){clearTimeout(_sbTimer);_sbTimer=setTimeout(function(){sbSave(d)},500)}}
+function toast(m,t){var e=document.getElementById('toast');e.textContent=m;e.className='toast toast-'+t+' show';clearTimeout(e._timer);e._timer=setTimeout(function(){e.classList.remove('show')},2500)}
+function showBadge(t){var a=document.getElementById('modeBadge'),b=document.getElementById('adminModeBadge');if(a){a.style.display='inline';a.textContent=t}if(b){b.style.display='inline';b.textContent=t}}
+function nowStr(){var d=new Date();function pad(n){return n<10?'0'+n:''+n}return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())}
 
-// ===== 数据层 =====
-var _DEFAULT_TOKEN_B64 = 'Z2hwX3p0eUNiZDkxVlZKYklRS2ZwVFgyV2dYU1BaREsyUzBrVDFPdg==';
-var GITHUB_TOKEN = localStorage.getItem('github_token') || (function(){try{return atob(_DEFAULT_TOKEN_B64)}catch(e){return ''}})();
-var GITHUB_REPO = 'songyunjie1994/sample-app';
-var GITHUB_FILE = 'data.json';
-var isCloudMode = !!(localStorage.getItem('github_token') || _DEFAULT_TOKEN_B64); // 默认开启云同步
-var _fileSha = null;
+var PRODUCT_LIST=['VITAFOLKS甘露糖','BriBeam牙膏套盒','VITAFOLKS红宝盒','MaxHealthy精氨酸','VITAFOLKS夜燃片【新】','MaxHealthy 男士营养包','MaxHealthy 女士营养包','MaxHealthy血糖片【新】','VITAFOLKS卡路里【新】','VITAFOLKS花园卫士','MaxHealthy胶原蛋白胶囊','MaxHealthy解酒片','Bioellis麦角硫因【新】','MaxHealthy 护肝片【新283】','Tessmel双仓替尔泊肽【多】','Tessmel双仓替尔泊肽【少】','Tessmel超模密码（新）','Tessmel 16小时日燃','Tessmel 8小时夜燃','Bioellis麦角硫因【更新】','Bioellis美白丸','Bioellis反重力','VITAFOLKS BHB燃脂','VITAFOLKS 21天排排宝','VITAMEE 清清片','Tessmel双仓替尔泊肽（TR）'];
+function addItemRow(){var c=document.getElementById('itemsContainer'),o='<option value="">请选择</option>';PRODUCT_LIST.forEach(function(p){o+='<option value="'+p+'">'+p.replace(/VITAFOLKS|MaxHealthy|Bioellis|BriBeam|Tessmel|VITAMEE\s*/g,'')+'</option>'});var d=document.createElement('div');d.className='item-row';d.style.cssText='display:flex;gap:8px;margin-bottom:8px';d.innerHTML='<select class="form-control" style="flex:2" required>'+o+'</select><input type="text" class="form-control" style="flex:1" placeholder="数量" required><button type="button" class="btn btn-sm btn-danger" onclick="removeItemRow(this)" style="width:auto;padding:4px 10px;font-size:14px">✕</button>';c.appendChild(d)}
+function removeItemRow(b){if(document.querySelectorAll('#itemsContainer .item-row').length<=1){toast('至少需要一个货品','error');return}b.parentElement.remove()}
+function getItems(){var r=document.querySelectorAll('#itemsContainer .item-row'),items=[];for(var i=0;i<r.length;i++){var s=r[i].querySelector('select'),q=r[i].querySelector('input[placeholder]');if(s&&s.value&&q&&q.value.trim())items.push({product:s.value,quantity:q.value.trim()})}return items}
+function checkRepeatPhone(){var p=document.getElementById('phone').value.trim(),w=document.getElementById('repeatWarning');if(!p){w.classList.add('hidden');return}var f=data.submissions.some(function(s){return s.phone===p&&s.status==='approved'});if(f)w.classList.remove('hidden');else w.classList.add('hidden')}
 
-function defaultData() { return { nextId:1, submissions:[], adminPassword:'admin123' }; }
-
-function toast(msg,type) {
-  var t=document.getElementById('toast'); t.textContent=msg; t.className='toast toast-'+type+' show';
-  clearTimeout(t._timer); t._timer=setTimeout(function(){t.classList.remove('show')},2500);
-}
-
-function showSyncStatus(msg) {
-  var e1=document.getElementById('syncStatus'),e2=document.getElementById('syncStatusAdmin');
-  if(e1){e1.textContent=msg;e1.classList.remove('hidden')} if(e2){e2.textContent=msg;e2.classList.remove('hidden')}
-}
-function hideSyncStatus() {
-  var e1=document.getElementById('syncStatus'),e2=document.getElementById('syncStatusAdmin');
-  if(e1)e1.classList.add('hidden'); if(e2)e2.classList.add('hidden');
-}
-
-async function loadFromGithub() {
-  if(!GITHUB_TOKEN) return null;
-  try {
-    var r=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json'}});
-    if(!r.ok) throw Error('HTTP '+r.status);
-    var j=await r.json(); _fileSha=j.sha; return JSON.parse(atob(j.content.replace(/\n/g,'')));
-  }catch(e){console.error('GitHub load fail:',e);return null}
-}
-
-async function saveToGithub(d) {
-  if(!GITHUB_TOKEN) return false;
-  try {
-    var content=btoa(unescape(encodeURIComponent(JSON.stringify(d))));
-    var body={message:'update data',content:content}; if(_fileSha) body.sha=_fileSha;
-    var r=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{method:'PUT',headers:{'Authorization':'token '+GITHUB_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(body)});
-    if(r.ok){var j=await r.json();_fileSha=j.content.sha} return r.ok;
-  }catch(e){console.error('GitHub save fail:',e);return false}
-}
-
-var data = defaultData();
-
-async function initData() {
-  if(isCloudMode){
-    showSyncStatus('☁️ 正在同步数据...');
-    var cd=await loadFromGithub();
-    if(cd&&cd.submissions&&cd.submissions.length>0){data=cd;hideSyncStatus();showBadge('☁️ GitHub 云同步');return}
-    // 云端无数据，将本地数据上传
-    try{var l=localStorage.getItem('sampleData');if(l){data=JSON.parse(l);if(data.submissions&&data.submissions.length>0){saveToGithub(data);showBadge('☁️ GitHub 云同步');hideSyncStatus();return}}}catch(e){}
-    showSyncStatus('⚠️ 云端加载失败');
-  }
-  try{var l=localStorage.getItem('sampleData');if(l)data=JSON.parse(l)}catch(e){}
-  showBadge(isCloudMode?'☁️ GitHub 云同步':'💻 本地');hideSyncStatus();
-}
-
-function showBadge(t) {
-  var b1=document.getElementById('modeBadge'),b2=document.getElementById('adminModeBadge');
-  if(b1){b1.style.display='inline';b1.textContent=t} if(b2){b2.style.display='inline';b2.textContent=t}
-}
-
-var _saveTimer=null;
-function saveData(d) {
-  data=d; localStorage.setItem('sampleData',JSON.stringify(d));
-  if(isCloudMode){
-    showSyncStatus('☁️ 保存中...');clearTimeout(_saveTimer);
-    _saveTimer=setTimeout(async function(){
-      var ok=await saveToGithub(d);
-      if(ok){showSyncStatus('☁️ 已同步');setTimeout(hideSyncStatus,2000)}
-      else showSyncStatus('⚠️ 同步失败');
-    },500);
-  }
-}
-
-function nowStr() {
-  var d=new Date(); function pad(n){return n<10?'0'+n:''+n}
-  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
-}
-
-// ===== 货品多选 =====
-var PRODUCT_LIST = ['VITAFOLKS甘露糖','BriBeam牙膏套盒','VITAFOLKS红宝盒','MaxHealthy精氨酸','VITAFOLKS夜燃片【新】','MaxHealthy 男士营养包','MaxHealthy 女士营养包','MaxHealthy血糖片【新】','VITAFOLKS卡路里【新】','VITAFOLKS花园卫士','MaxHealthy胶原蛋白胶囊','MaxHealthy解酒片','Bioellis麦角硫因【新】','MaxHealthy 护肝片【新283】','Tessmel双仓替尔泊肽【多】','Tessmel双仓替尔泊肽【少】','Tessmel超模密码（新）','Tessmel 16小时日燃','Tessmel 8小时夜燃','Bioellis麦角硫因【更新】','Bioellis美白丸','Bioellis反重力','VITAFOLKS BHB燃脂','VITAFOLKS 21天排排宝','VITAMEE 清清片','Tessmel双仓替尔泊肽（TR）'];
-
-function addItemRow() {
-  var c=document.getElementById('itemsContainer');
-  var opts='<option value="">请选择</option>';
-  PRODUCT_LIST.forEach(function(p){opts+='<option value="'+p+'">'+p.replace(/VITAFOLKS|MaxHealthy|Bioellis|BriBeam|Tessmel|VITAMEE\s*/g,'')+'</option>'});
-  var d=document.createElement('div'); d.className='item-row'; d.style.cssText='display:flex;gap:8px;margin-bottom:8px';
-  d.innerHTML='<select class="form-control" style="flex:2" required>'+opts+'</select><input type="text" class="form-control" style="flex:1" placeholder="数量" required><button type="button" class="btn btn-sm btn-danger" onclick="removeItemRow(this)" style="width:auto;padding:4px 10px;font-size:14px">✕</button>';
-  c.appendChild(d);
-}
-
-function removeItemRow(btn) {
-  var rows=document.querySelectorAll('#itemsContainer .item-row');
-  if(rows.length<=1){toast('至少需要一个货品','error');return}
-  btn.parentElement.remove();
-}
-
-function getItems() {
-  var rows=document.querySelectorAll('#itemsContainer .item-row'),items=[];
-  for(var i=0;i<rows.length;i++){
-    var sel=rows[i].querySelector('select'),qty=rows[i].querySelector('input[placeholder]');
-    if(sel&&sel.value&&qty&&qty.value.trim()) items.push({product:sel.value,quantity:qty.value.trim()});
-  }
-  return items;
-}
-
-// ===== 手机号重复核查 =====
-function checkRepeatPhone() {
-  var phone=document.getElementById('phone').value.trim();
-  var w=document.getElementById('repeatWarning');
-  if(!phone){w.classList.add('hidden');return}
-  var found=data.submissions.some(function(s){return s.phone===phone&&s.status==='approved'});
-  if(found) w.classList.remove('hidden'); else w.classList.add('hidden');
-}
-
-// ===== 用户端 =====
 document.getElementById('submitForm').addEventListener('submit',function(e){
-  e.preventDefault();
-  var business=document.getElementById('business').value.trim();
-  var name=document.getElementById('name').value.trim();
-  var phone=document.getElementById('phone').value.trim();
-  var address=document.getElementById('address').value.trim();
-  var shipDate=document.getElementById('shipDate').value.trim();
-  var isSF=document.querySelector('input[name="sfRadio"]:checked').value;
-  var desc=document.getElementById('description').value.trim();
-  var items=getItems();
-  var repeatReason=document.getElementById('repeatReason').value.trim();
-
-  if(!business){toast('请填写商务','error');return}
-  if(!name){toast('请填写姓名','error');return}
-  if(!phone){toast('请填写电话','error');return}
-  if(!address){toast('请填写地址','error');return}
-  if(items.length===0){toast('请至少添加一个货品','error');return}
-  for(var i=0;i<items.length;i++){if(!items[i].quantity){toast('请填写所有货品的数量','error');return}}
-  if(!shipDate){toast('请选择发货日期','error');return}
-
-  // 重复申请检查
-  var hasRepeat=data.submissions.some(function(s){return s.phone===phone&&s.status==='approved'});
-  if(hasRepeat&&!repeatReason){toast('请填写重复申请原因','error');return}
-
-  var btn=document.getElementById('submitBtn');
-  btn.disabled=true;btn.textContent='提交中...';
-
-  // 生成货品摘要
-  var itemDesc=items.map(function(it){return it.product+'×'+it.quantity}).join('、');
-  var product=items[0].product||'';
-  var quantity=items[0].quantity||'';
-  var allItems=JSON.stringify(items);
-
-  data.submissions.unshift({
-    id:data.nextId++,
-    business:business,
-    name:name,phone:phone,
-    address:address,
-    product:product,
-    quantity:quantity,
-    items:allItems,
-    itemSummary:itemDesc,
-    isSF:isSF,
-    shipDate:shipDate,
-    repeatReason:repeatReason||'',
-    description:desc,
-    status:'pending',
-    created_at:nowStr(),updated_at:nowStr()
-  });
-  saveData(data);
-
-  btn.disabled=false;btn.textContent='提交申请';
-  document.getElementById('formView').classList.add('hidden');
-  document.getElementById('successView').classList.remove('hidden');
-  toast('提交成功！','success');
+e.preventDefault();var b=document.getElementById('business').value.trim(),n=document.getElementById('name').value.trim(),p=document.getElementById('phone').value.trim(),a=document.getElementById('address').value.trim(),s=document.getElementById('shipDate').value.trim(),sf=document.querySelector('input[name="sfRadio"]:checked').value,d=document.getElementById('description').value.trim(),items=getItems(),rr=document.getElementById('repeatReason').value.trim();
+if(!b){toast('请填写商务','error');return}if(!n){toast('请填写姓名','error');return}if(!p){toast('请填写电话','error');return}if(!a){toast('请填写地址','error');return}if(items.length===0){toast('请至少添加一个货品','error');return}for(var i=0;i<items.length;i++){if(!items[i].quantity){toast('请填写所有货品的数量','error');return}}if(!s){toast('请选择发货日期','error');return}if(data.submissions.some(function(s){return s.phone===p&&s.status==='approved'})&&!rr){toast('请填写重复申请原因','error');return}
+var btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='提交中...';var itemDesc=items.map(function(it){return it.product+'×'+it.quantity}).join('、');data.submissions.unshift({id:data.nextId++,business:b,name:n,phone:p,address:a,product:items[0].product,quantity:items[0].quantity,items:JSON.stringify(items),itemSummary:itemDesc,isSF:sf,shipDate:s,repeatReason:rr||'',description:d,status:'pending',created_at:nowStr(),updated_at:nowStr()});saveData(data);btn.disabled=false;btn.textContent='提交申请';document.getElementById('formView').classList.add('hidden');document.getElementById('successView').classList.remove('hidden');toast('提交成功！','success')
 });
+function resetForm(){document.getElementById('submitForm').reset();document.getElementById('repeatWarning').classList.add('hidden');document.getElementById('successView').classList.add('hidden');document.getElementById('formView').classList.remove('hidden')}
 
-function resetForm(){
-  document.getElementById('submitForm').reset();
-  document.getElementById('repeatWarning').classList.add('hidden');
-  document.getElementById('successView').classList.add('hidden');
-  document.getElementById('formView').classList.remove('hidden');
-}
-
-// ===== 管理端 =====
-function doLogin() {
-  var pwd=document.getElementById('loginPassword').value;
-  if(pwd===data.adminPassword){localStorage.setItem('adminLoggedIn','1');showAdmin();toast('登录成功','success')}
-  else toast('密码错误','error');
-}
-
-function checkLogin() {
-  if(localStorage.getItem('adminLoggedIn')==='1') showAdmin();
-  else {document.getElementById('loginView').classList.remove('hidden');document.getElementById('adminView').classList.add('hidden');showPage('admin')}
-}
-
-function showAdmin() {
-  document.getElementById('loginView').classList.add('hidden');document.getElementById('adminView').classList.remove('hidden');
-  showPage('admin');refreshAdmin();
-}
-
-function logout() {
-  localStorage.removeItem('adminLoggedIn');document.getElementById('loginView').classList.remove('hidden');
-  document.getElementById('adminView').classList.add('hidden');toast('已退出','info');
-}
+function doLogin(){var p=document.getElementById('loginPassword').value;if(p===data.adminPassword){localStorage.setItem('adminLoggedIn','1');showAdmin();toast('登录成功','success')}else toast('密码错误','error')}
+function checkLogin(){if(localStorage.getItem('adminLoggedIn')==='1')showAdmin();else{document.getElementById('loginView').classList.remove('hidden');document.getElementById('adminView').classList.add('hidden');showPage('admin')}}
+function showAdmin(){document.getElementById('loginView').classList.add('hidden');document.getElementById('adminView').classList.remove('hidden');showPage('admin');refreshAdmin()}
+function logout(){localStorage.removeItem('adminLoggedIn');document.getElementById('loginView').classList.remove('hidden');document.getElementById('adminView').classList.add('hidden');toast('已退出','info')}
 
 var currentPage=1,currentStatus='',currentShipDate='';
-
-function showPage(page){
-  document.getElementById('pageUser').classList.toggle('hidden',page!=='user');
-  document.getElementById('pageAdmin').classList.toggle('hidden',page!=='admin');
-  document.getElementById('navUser').classList.toggle('active',page==='user');
-  document.getElementById('navAdmin').classList.toggle('active',page==='admin');
-  if(page==='admin'&&!document.getElementById('adminView').classList.contains('hidden')) refreshAdmin();
-}
-
-function refreshAdmin(){
-  var t=data.submissions.length;
-  document.getElementById('totalLabel').textContent=t;
-  document.getElementById('sPending').textContent=data.submissions.filter(function(s){return s.status==='pending'}).length;
-  document.getElementById('sApproved').textContent=data.submissions.filter(function(s){return s.status==='approved'}).length;
-  document.getElementById('sRejected').textContent=data.submissions.filter(function(s){return s.status==='rejected'}).length;
-  renderList();
-}
-
-function renderList(){
-  var list=document.getElementById('subList');
-  var filtered=data.submissions;
-  if(currentStatus) filtered=filtered.filter(function(s){return s.status===currentStatus});
-  if(currentShipDate) filtered=filtered.filter(function(s){return s.shipDate===currentShipDate});
-  var total=filtered.length,limit=20,pages=Math.max(1,Math.ceil(total/limit));
-  if(currentPage>pages) currentPage=pages;
-  var offset=(currentPage-1)*limit;
-  var rows=filtered.slice(offset,offset+limit);
-  if(rows.length===0) list.innerHTML='<div class="empty"><div class="icon">📭</div><p>暂无记录</p></div>';
-  else list.innerHTML=rows.map(function(item){return renderCard(item)}).join('');
-  document.getElementById('pageInfo').textContent='第 '+currentPage+' / '+pages+' 页（共 '+total+' 条）';
-  document.getElementById('prevPage').disabled=currentPage<=1;
-  document.getElementById('nextPage').disabled=currentPage>=pages;
-}
-
-function statusHtml(s){
-  if(s==='pending') return '<span class="status status-pending">⏳ 待审核</span>';
-  if(s==='approved') return '<span class="status status-approved">✅ 已通过</span>';
-  return '<span class="status status-rejected">❌ 已拒绝</span>';
-}
-
-function renderCard(item){
-  var acts;
-  if(item.status==='pending') acts='<button class="btn btn-sm btn-success" onclick="review('+item.id+',\'approved\')">通过</button><button class="btn btn-sm btn-danger" onclick="review('+item.id+',\'rejected\')">拒绝</button><button class="btn btn-sm btn-outline" onclick="delItem('+item.id+')">删除</button>';
-  else acts='<button class="btn btn-sm btn-outline" onclick="delItem('+item.id+')">删除</button>';
-  var desc=item.description?'<div class="desc">📝 '+item.description+'</div>':'';
-  var addr=item.address?'<div class="info">📍 '+item.address+'</div>':'';
-  var biz=item.business?'<div class="info">👤 商务:'+item.business+'</div>':'';
-  var itemsDisplay=item.itemSummary?'<div class="info">📦 '+item.itemSummary+'</div>':'';
-  var sfDisplay=item.isSF?'<div class="info">🚚 '+(item.isSF==='是'?'顺丰':'非顺丰')+'</div>':'';
-  var ship=item.shipDate?'<div class="info">📅 '+item.shipDate+'</div>':'';
-  var repeat=item.repeatReason?'<div class="desc">🔄 重复原因:'+item.repeatReason+'</div>':'';
-  return '<div class="sub-item" id="si-'+item.id+'">'+
-    '<div class="top"><span class="name">'+item.name+'</span>'+statusHtml(item.status)+'</div>'+
-    '<div class="info">📞 '+item.phone+'</div>'+
-    biz+itemsDisplay+sfDisplay+ship+addr+repeat+
-    '<div class="time">🕐 '+item.created_at+'</div>'+desc+
-    '<div class="acts">'+acts+'</div></div>';
-}
-
-function review(id,action){
-  var txt=action==='approved'?'通过':'拒绝';
-  if(!confirm('确定'+txt+'这个申请吗？')) return;
-  var item=data.submissions.find(function(s){return s.id===id});
-  if(!item){toast('未找到','error');return}
-  if(item.status!=='pending'){toast('该申请已被处理','error');return}
-  item.status=action;item.updated_at=nowStr();saveData(data);
-  toast(action==='approved'?'已通过':'已拒绝','success');renderList();
-}
-
-function delItem(id){
-  if(!confirm('确定删除吗？不可恢复！')) return;
-  var idx=data.submissions.findIndex(function(s){return s.id===id});
-  if(idx===-1){toast('未找到','error');return}
-  data.submissions.splice(idx,1);saveData(data);toast('已删除','info');renderList();
-}
-
-function changePage(delta){currentPage=Math.max(1,currentPage+delta);renderList()}
-
-document.querySelectorAll('.filter-btn').forEach(function(btn){
-  btn.addEventListener('click',function(){
-    document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});
-    btn.classList.add('active');currentStatus=btn.getAttribute('data-s');currentPage=1;renderList();
-  });
-});
-
-function applyDateFilter(){
-  var val=document.getElementById('filterShipDate').value;
-  if(!val){toast('请选择日期','error');return}
-  currentShipDate=val;currentPage=1;renderList();
-}
+function showPage(p){document.getElementById('pageUser').classList.toggle('hidden',p!=='user');document.getElementById('pageAdmin').classList.toggle('hidden',p!=='admin');document.getElementById('navUser').classList.toggle('active',p==='user');document.getElementById('navAdmin').classList.toggle('active',p==='admin');if(p==='admin'&&!document.getElementById('adminView').classList.contains('hidden'))refreshAdmin()}
+function refreshAdmin(){var t=data.submissions.length;document.getElementById('totalLabel').textContent=t;document.getElementById('sPending').textContent=data.submissions.filter(function(s){return s.status==='pending'}).length;document.getElementById('sApproved').textContent=data.submissions.filter(function(s){return s.status==='approved'}).length;document.getElementById('sRejected').textContent=data.submissions.filter(function(s){return s.status==='rejected'}).length;renderList()}
+function renderList(){var list=document.getElementById('subList'),filtered=data.submissions;if(currentStatus)filtered=filtered.filter(function(s){return s.status===currentStatus});if(currentShipDate)filtered=filtered.filter(function(s){return s.shipDate===currentShipDate});var total=filtered.length,limit=20,pages=Math.max(1,Math.ceil(total/limit));if(currentPage>pages)currentPage=pages;var offset=(currentPage-1)*limit,rows=filtered.slice(offset,offset+limit);if(rows.length===0)list.innerHTML='<div class="empty"><div class="icon">📭</div><p>暂无记录</p></div>';else list.innerHTML=rows.map(function(item){return renderCard(item)}).join('');document.getElementById('pageInfo').textContent='第 '+currentPage+' / '+pages+' 页（共 '+total+' 条）';document.getElementById('prevPage').disabled=currentPage<=1;document.getElementById('nextPage').disabled=currentPage>=pages}
+function statusHtml(s){if(s==='pending')return '<span class="status status-pending">⏳ 待审核</span>';if(s==='approved')return '<span class="status status-approved">✅ 已通过</span>';return '<span class="status status-rejected">❌ 已拒绝</span>'}
+function renderCard(item){var acts=item.status==='pending'?'<button class="btn btn-sm btn-success" onclick="review('+item.id+',\'approved\')">通过</button><button class="btn btn-sm btn-danger" onclick="review('+item.id+',\'rejected\')">拒绝</button><button class="btn btn-sm btn-outline" onclick="delItem('+item.id+')">删除</button>':'<button class="btn btn-sm btn-outline" onclick="delItem('+item.id+')">删除</button>';var desc=item.description?'<div class="desc">📝 '+item.description+'</div>':'',addr=item.address?'<div class="info">📍 '+item.address+'</div>':'',biz=item.business?'<div class="info">👤 商务:'+item.business+'</div>':'',itemsDisplay=item.itemSummary?'<div class="info">📦 '+item.itemSummary+'</div>':'',sfDisplay=item.isSF?'<div class="info">🚚 '+(item.isSF==='是'?'顺丰':'非顺丰')+'</div>':'',ship=item.shipDate?'<div class="info">📅 '+item.shipDate+'</div>':'',repeat=item.repeatReason?'<div class="desc">🔄 重复原因:'+item.repeatReason+'</div>':'';return '<div class="sub-item" id="si-'+item.id+'"><div class="top"><span class="name">'+item.name+'</span>'+statusHtml(item.status)+'</div><div class="info">📞 '+item.phone+'</div>'+biz+itemsDisplay+sfDisplay+ship+addr+repeat+'<div class="time">🕐 '+item.created_at+'</div>'+desc+'<div class="acts">'+acts+'</div></div>'}
+function review(id,action){var t=action==='approved'?'通过':'拒绝';if(!confirm('确定'+t+'这个申请吗？'))return;var item=data.submissions.find(function(s){return s.id===id});if(!item){toast('未找到','error');return}if(item.status!=='pending'){toast('该申请已被处理','error');return}item.status=action;item.updated_at=nowStr();saveData(data);toast(action==='approved'?'已通过':'已拒绝','success');renderList()}
+function delItem(id){if(!confirm('确定删除吗？不可恢复！'))return;var idx=data.submissions.findIndex(function(s){return s.id===id});if(idx===-1){toast('未找到','error');return}data.submissions.splice(idx,1);saveData(data);toast('已删除','info');renderList()}
+function changePage(d){currentPage=Math.max(1,currentPage+d);renderList()}
+document.querySelectorAll('.filter-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.filter-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active');currentStatus=b.getAttribute('data-s');currentPage=1;renderList()})});
+function applyDateFilter(){var v=document.getElementById('filterShipDate').value;if(!v){toast('请选择日期','error');return}currentShipDate=v;currentPage=1;renderList()}
 function clearDateFilter(){currentShipDate='';document.getElementById('filterShipDate').value='';currentPage=1;renderList()}
 
-// ===== 货品匹配表 =====
-var PRODUCT_DB={
-  "VITAFOLKS甘露糖":{code:"V-009",barcode:"9354461000248"},"甘露糖":{code:"V-009",barcode:"9354461000248"},
-  "BriBeam牙膏套盒":{code:"BB-001",barcode:"9354461000422"},"BB牙膏套盒":{code:"BB-001",barcode:"9354461000422"},
-  "VITAFOLKS红宝盒":{code:"V-016",barcode:"9354461000552"},"红宝盒":{code:"V-016",barcode:"9354461000552"},
-  "MaxHealthy精氨酸":{code:"MAX-009",barcode:"9354461000569"},"精氨酸":{code:"MAX-009",barcode:"9354461000569"},
-  "VITAFOLKS夜燃片【新】":{code:"V-018",barcode:"9354461000798"},"夜燃片【新】":{code:"V-018",barcode:"9354461000798"},
-  "MaxHealthy 男士营养包":{code:"MAX-013",barcode:"9354461000804"},"男士营养包":{code:"MAX-013",barcode:"9354461000804"},
-  "MaxHealthy 女士营养包":{code:"MAX-014",barcode:"9354461000811"},"女士营养包":{code:"MAX-014",barcode:"9354461000811"},
-  "MaxHealthy血糖片【新】":{code:"MAX-015",barcode:"9354461001221"},"血糖片【新】":{code:"MAX-015",barcode:"9354461001221"},
-  "VITAFOLKS卡路里【新】":{code:"V-019",barcode:"9354461001238"},"卡路里【新】":{code:"V-019",barcode:"9354461001238"},
-  "VITAFOLKS花园卫士":{code:"V-021",barcode:"9354461001061"},"花园卫士":{code:"V-021",barcode:"9354461001061"},
-  "MaxHealthy胶原蛋白胶囊":{code:"MAX-017",barcode:"9354461001139"},"胶原蛋白胶囊":{code:"MAX-017",barcode:"9354461001139"},
-  "MaxHealthy解酒片":{code:"MAX-018",barcode:"9354461001245"},"解酒片":{code:"MAX-018",barcode:"9354461001245"},
-  "Bioellis麦角硫因【新】":{code:"BIO-02",barcode:"9354461001368"},"麦角硫因【新】":{code:"BIO-02",barcode:"9354461001368"},
-  "MaxHealthy 护肝片【新283】":{code:"MAX-019",barcode:"9354461001283"},"护肝片【新283】":{code:"MAX-019",barcode:"9354461001283"},
-  "Tessmel双仓替尔泊肽【多】":{code:"Tessmel-03",barcode:"9354461001429"},"Tessmel双仓替尔泊肽【少】":{code:"Tessmel-04",barcode:"9354461001436"},
-  "Tessmel超模密码（新）":{code:"Tessmel-05",barcode:"9354461001351"},"超模密码（新）":{code:"Tessmel-05",barcode:"9354461001351"},
-  "Tessmel 16小时日燃":{code:"Tessmel-06",barcode:"9354461001467"},"16小时日燃":{code:"Tessmel-06",barcode:"9354461001467"},
-  "Tessmel 8小时夜燃":{code:"Tessmel-07",barcode:"9354461001474"},"8小时夜燃":{code:"Tessmel-07",barcode:"9354461001474"},
-  "Bioellis麦角硫因【更新】":{code:"BIO-03",barcode:"9354461001382"},"Bioellis美白丸":{code:"BIO-04",barcode:"9354461001535"},
-  "Bioellis反重力":{code:"BIO-05",barcode:"9354461001405"},"VITAFOLKS BHB燃脂":{code:"V-026",barcode:"9354461000781"},"BHB燃脂":{code:"V-026",barcode:"9354461000781"},
-  "VITAFOLKS 21天排排宝":{code:"V-027",barcode:"9354461000774"},"21天排排宝":{code:"V-027",barcode:"9354461000774"},
-  "VITAMEE 清清片":{code:"VM-001",barcode:"9354461001528"},"清清片":{code:"VM-001",barcode:"9354461001528"},
-  "Tessmel双仓替尔泊肽（TR）":{code:"Tessmel-08",barcode:"9354461001559"}
-};
+var PRODUCT_DB={"VITAFOLKS甘露糖":{code:"V-009",barcode:"9354461000248"},"甘露糖":{code:"V-009",barcode:"9354461000248"},"BriBeam牙膏套盒":{code:"BB-001",barcode:"9354461000422"},"BB牙膏套盒":{code:"BB-001",barcode:"9354461000422"},"VITAFOLKS红宝盒":{code:"V-016",barcode:"9354461000552"},"红宝盒":{code:"V-016",barcode:"9354461000552"},"MaxHealthy精氨酸":{code:"MAX-009",barcode:"9354461000569"},"精氨酸":{code:"MAX-009",barcode:"9354461000569"},"VITAFOLKS夜燃片【新】":{code:"V-018",barcode:"9354461000798"},"夜燃片【新】":{code:"V-018",barcode:"9354461000798"},"MaxHealthy 男士营养包":{code:"MAX-013",barcode:"9354461000804"},"男士营养包":{code:"MAX-013",barcode:"9354461000804"},"MaxHealthy 女士营养包":{code:"MAX-014",barcode:"9354461000811"},"女士营养包":{code:"MAX-014",barcode:"9354461000811"},"MaxHealthy血糖片【新】":{code:"MAX-015",barcode:"9354461001221"},"血糖片【新】":{code:"MAX-015",barcode:"9354461001221"},"VITAFOLKS卡路里【新】":{code:"V-019",barcode:"9354461001238"},"卡路里【新】":{code:"V-019",barcode:"9354461001238"},"VITAFOLKS花园卫士":{code:"V-021",barcode:"9354461001061"},"花园卫士":{code:"V-021",barcode:"9354461001061"},"MaxHealthy胶原蛋白胶囊":{code:"MAX-017",barcode:"9354461001139"},"胶原蛋白胶囊":{code:"MAX-017",barcode:"9354461001139"},"MaxHealthy解酒片":{code:"MAX-018",barcode:"9354461001245"},"解酒片":{code:"MAX-018",barcode:"9354461001245"},"Bioellis麦角硫因【新】":{code:"BIO-02",barcode:"9354461001368"},"麦角硫因【新】":{code:"BIO-02",barcode:"9354461001368"},"MaxHealthy 护肝片【新283】":{code:"MAX-019",barcode:"9354461001283"},"护肝片【新283】":{code:"MAX-019",barcode:"9354461001283"},"Tessmel双仓替尔泊肽【多】":{code:"Tessmel-03",barcode:"9354461001429"},"Tessmel双仓替尔泊肽【少】":{code:"Tessmel-04",barcode:"9354461001436"},"Tessmel超模密码（新）":{code:"Tessmel-05",barcode:"9354461001351"},"超模密码（新）":{code:"Tessmel-05",barcode:"9354461001351"},"Tessmel 16小时日燃":{code:"Tessmel-06",barcode:"9354461001467"},"16小时日燃":{code:"Tessmel-06",barcode:"9354461001467"},"Tessmel 8小时夜燃":{code:"Tessmel-07",barcode:"9354461001474"},"8小时夜燃":{code:"Tessmel-07",barcode:"9354461001474"},"Bioellis麦角硫因【更新】":{code:"BIO-03",barcode:"9354461001382"},"Bioellis美白丸":{code:"BIO-04",barcode:"9354461001535"},"Bioellis反重力":{code:"BIO-05",barcode:"9354461001405"},"VITAFOLKS BHB燃脂":{code:"V-026",barcode:"9354461000781"},"BHB燃脂":{code:"V-026",barcode:"9354461000781"},"VITAFOLKS 21天排排宝":{code:"V-027",barcode:"9354461000774"},"21天排排宝":{code:"V-027",barcode:"9354461000774"},"VITAMEE 清清片":{code:"VM-001",barcode:"9354461001528"},"清清片":{code:"VM-001",barcode:"9354461001528"},"Tessmel双仓替尔泊肽（TR）":{code:"Tessmel-08",barcode:"9354461001559"}};
+function lookupProduct(n){if(!n)return null;if(PRODUCT_DB[n])return PRODUCT_DB[n];var k=Object.keys(PRODUCT_DB);for(var i=0;i<k.length;i++){if(n.indexOf(k[i])!==-1||k[i].indexOf(n)!==-1)return PRODUCT_DB[k[i]]}return null}
 
-function lookupProduct(name){if(!name)return null;if(PRODUCT_DB[name])return PRODUCT_DB[name];var keys=Object.keys(PRODUCT_DB);for(var i=0;i<keys.length;i++){if(name.indexOf(keys[i])!==-1||keys[i].indexOf(name)!==-1)return PRODUCT_DB[keys[i]]}return null}
+function exportFiltered(){var sd=document.getElementById('filterShipDate').value;if(!sd){toast('请先选择发货日期再导出','error');return}var f=data.submissions.filter(function(s){return s.shipDate===sd});if(f.length===0){toast('该日期没有数据','error');return}var h=['店铺名称','原始单号','收件人','省','市','区','手机','固话','邮编','网名','地址','发货条件','应收合计','已付金额','邮费','优惠金额','COD买家费用','仓库名称','物流公司','下单时间','付款时间','买家备注','客服备注','分销商','发票抬头','发票内容','支付方式','业务员','商家编码','货品数量'],r=[h];f.forEach(function(item,idx){var on=sd.replace(/-/g,'')+String(idx+1).padStart(3,'0'),ia=[];try{if(item.items)ia=JSON.parse(item.items)}catch(e){}if(ia.length>0){ia.forEach(function(it){var p=lookupProduct(it.product)||{code:it.product||''};r.push(['店铺vitafolks',on,item.name||'','','','',item.phone||'','','','',item.address||'','款到发货','0','0','0','0','0','','',item.created_at||'','',item.description||'','','','','','',item.business||'',p.code,it.quantity])})}else{var p=lookupProduct(item.product)||{code:item.product||''};r.push(['店铺vitafolks',on,item.name||'','','','',item.phone||'','','','',item.address||'','款到发货','0','0','0','0','0','','',item.created_at||'','',item.description||'','','','','','',item.business||'',p.code,item.quantity||'1'])}});var csv=r.map(function(x){return x.map(function(c){return '"'+(c||'').replace(/"/g,'""')+'"'}).join(',')}).join('\n');var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='寄样_'+sd+'.csv';a.click();URL.revokeObjectURL(url);toast('已导出 '+f.length+' 条','success')}
 
-// ===== ERP导出 =====
-function exportFiltered(){
-  var shipDate=document.getElementById('filterShipDate').value;
-  if(!shipDate){toast('请先选择发货日期再导出','error');return}
-  var filtered=data.submissions.filter(function(s){return s.shipDate===shipDate});
-  if(filtered.length===0){toast('该日期没有数据','error');return}
-  var headers=['店铺名称','原始单号','收件人','省','市','区','手机','固话','邮编','网名','地址','发货条件','应收合计','已付金额','邮费','优惠金额','COD买家费用','仓库名称','物流公司','下单时间','付款时间','买家备注','客服备注','分销商','发票抬头','发票内容','支付方式','业务员','商家编码','货品数量'];
-  var rows=[headers];
-  filtered.forEach(function(item,idx){
-    var orderNo=shipDate.replace(/-/g,'')+String(idx+1).padStart(3,'0');
-    // 展开多货品为多行
-    var itemsArr=[];
-    try{if(item.items)itemsArr=JSON.parse(item.items)}catch(e){}
-    if(itemsArr.length>0){
-      itemsArr.forEach(function(it){
-        var pdb=lookupProduct(it.product)||{code:it.product||'',barcode:''};
-        rows.push(['店铺vitafolks',orderNo,item.name||'','','','',item.phone||'','','','',item.address||'','款到发货','0','0','0','0','0','','',item.created_at||'','',item.description||'','','','','','',item.business||'',pdb.code,it.quantity]);
-      });
-    }else{
-      var pdb=lookupProduct(item.product)||{code:item.product||'',barcode:''};
-      rows.push(['店铺vitafolks',orderNo,item.name||'','','','',item.phone||'','','','',item.address||'','款到发货','0','0','0','0','0','','',item.created_at||'','',item.description||'','','','','','',item.business||'',pdb.code,item.quantity||'1']);
-    }
-  });
-  var csv=rows.map(function(r){return r.map(function(c){return '"'+(c||'').replace(/"/g,'""')+'"'}).join(',')}).join('\n');
-  var bom='﻿';
-  var blob=new Blob([bom+csv],{type:'text/csv;charset=utf-8;'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url;a.download='寄样_'+shipDate+'.csv';
-  a.click();URL.revokeObjectURL(url);
-  toast('已导出 '+filtered.length+' 条','success');
-}
-
-// ===== 设置 =====
-function showSettings(){
-  document.getElementById('setPassword').value=data.adminPassword;
-  document.getElementById('githubToken').value=GITHUB_TOKEN;
-  document.getElementById('githubStatus').textContent=isCloudMode?'☁️ GitHub 云同步已开启':'💻 当前使用本地存储';
-  document.getElementById('settingsModal').style.display='flex';
-}
+function showSettings(){document.getElementById('setPassword').value=data.adminPassword;document.getElementById('sbUrl').value=SUPABASE_URL;document.getElementById('sbKey').value=SUPABASE_KEY;document.getElementById('sbStatus').textContent=isCloudMode?'☁️ Supabase 云同步已开启':'💻 当前使用本地存储';document.getElementById('settingsModal').style.display='flex'}
 function closeSettings(){document.getElementById('settingsModal').style.display='none';document.getElementById('exportArea').classList.add('hidden')}
 function savePassword(){var p=document.getElementById('setPassword').value.trim();if(!p||p.length<4){toast('密码至少4位','error');return}data.adminPassword=p;saveData(data);toast('密码已更新','success')}
-function saveGithub(){var t=document.getElementById('githubToken').value.trim();if(!t){toast('请填写 GitHub Token','error');return}GITHUB_TOKEN=t;isCloudMode=true;localStorage.setItem('github_token',t);document.getElementById('githubStatus').textContent='✅ 配置已保存，正在同步...';toast('配置已保存，正在同步...','info');showBadge('☁️ GitHub 云同步');saveToGithub(data).then(function(ok){if(ok){document.getElementById('githubStatus').textContent='✅ 同步成功！数据已上传云端';toast('同步成功！','success')}else{document.getElementById('githubStatus').textContent='⚠️ 数据上传失败，请检查Token是否正确';toast('同步失败','error')}})}
-function clearGithub(){if(!confirm('确定清除同步配置？'))return;GITHUB_TOKEN='';isCloudMode=false;localStorage.removeItem('github_token');document.getElementById('githubToken').value='';document.getElementById('githubStatus').textContent='💻 已切换为本地存储';showBadge('💻 本地');toast('已清除','info')}
-function exportData(){var area=document.getElementById('exportArea'),text=document.getElementById('exportText');var exp={exportTime:nowStr(),version:'1.0',data:data};text.value=JSON.stringify(exp,null,2);area.classList.remove('hidden');var blob=new Blob([text.value],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='sample-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);toast('已导出','success')}
-function copyExport(){var text=document.getElementById('exportText');text.select();navigator.clipboard.writeText(text.value).then(function(){toast('已复制','success')})}
+function saveSupabase(){var u=document.getElementById('sbUrl').value.trim(),k=document.getElementById('sbKey').value.trim();if(!u||!k){toast('请填写完整的 URL 和 Key','error');return}SUPABASE_URL=u;SUPABASE_KEY=k;isCloudMode=true;localStorage.setItem('supabase_url',u);localStorage.setItem('supabase_key',k);document.getElementById('sbStatus').textContent='✅ 配置已保存，正在同步...';toast('配置已保存，正在同步...','info');showBadge('☁️ 云同步');sbSave(data).then(function(){document.getElementById('sbStatus').textContent='✅ 同步成功！';toast('同步成功！','success')})}
+function clearSupabase(){if(!confirm('确定清除同步配置？'))return;SUPABASE_URL='';SUPABASE_KEY='';isCloudMode=false;localStorage.removeItem('supabase_url');localStorage.removeItem('supabase_key');document.getElementById('sbUrl').value='';document.getElementById('sbKey').value='';document.getElementById('sbStatus').textContent='💻 已切换为本地存储';showBadge('💻 本地');toast('已清除','info')}
+function exportData(){var area=document.getElementById('exportArea'),text=document.getElementById('exportText'),exp={exportTime:nowStr(),version:'1.0',data:data};text.value=JSON.stringify(exp,null,2);area.classList.remove('hidden');var blob=new Blob([text.value],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='sample-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);toast('已导出','success')}
+function copyExport(){var t=document.getElementById('exportText');t.select();navigator.clipboard.writeText(t.value).then(function(){toast('已复制','success')})}
 function importData(ev){var file=ev.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var obj=JSON.parse(e.target.result);if(!obj.data||!obj.data.submissions){toast('文件格式无效','error');return}if(!confirm('导入将覆盖现有数据，确认继续？'))return;data=obj.data;saveData(data);toast('导入成功！共 '+data.submissions.length+' 条记录','success');refreshAdmin();closeSettings()}catch(err){toast('文件解析失败','error')}};reader.readAsText(file);ev.target.value=''}
 document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)closeSettings()});
 
-// ===== 哈希路由 =====
-function handleHash() {
-  var hash=location.hash.replace('#','')||'user';
-  if(hash==='admin') checkLogin(); else showPage('user');
-}
+function handleHash(){var h=location.hash.replace('#','')||'user';if(h==='admin')checkLogin();else showPage('user')}
 window.addEventListener('hashchange',handleHash);
-
-// ===== 初始化 =====
-handleHash();
-initData().then(function(){
-  var hash=location.hash.replace('#','')||'user';
-  if(hash==='admin')refreshAdmin();
-}).catch(function(e){console.error('init error:',e)});
+handleHash();initData().then(function(){var h=location.hash.replace('#','')||'user';if(h==='admin'&&localStorage.getItem('adminLoggedIn')==='1')refreshAdmin()}).catch(function(e){console.error('init:',e)});
 </script>
 </body>
 </html>

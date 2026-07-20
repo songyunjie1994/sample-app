@@ -131,8 +131,8 @@ textarea.form-control{resize:vertical;min-height:80px}
             <input type="text" class="form-control" id="quantity" placeholder="如：5个 / 2箱（选填）">
           </div>
           <div class="form-group">
-            <label>期望发货日期</label>
-            <input type="date" class="form-control" id="shipDate">
+            <label>发货日期 <span class="required">*</span></label>
+            <input type="date" class="form-control" id="shipDate" required>
           </div>
           <div class="form-group">
             <label>备注说明</label>
@@ -207,6 +207,7 @@ textarea.form-control{resize:vertical;min-height:80px}
         <input type="date" id="filterShipDate" style="padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--card);color:var(--text)">
         <button class="btn btn-sm btn-primary" onclick="applyDateFilter()" style="width:auto">筛选</button>
         <button class="btn btn-sm btn-outline" onclick="clearDateFilter()" style="width:auto">清除</button>
+        <button class="btn btn-sm btn-success" onclick="exportFiltered()" style="width:auto;margin-left:auto">📊 导出筛选结果</button>
       </div>
 
       <div id="subList"></div>
@@ -477,6 +478,7 @@ document.getElementById('submitForm').addEventListener('submit', function(e) {
   if (!phone) { toast('请填写电话', 'error'); return; }
   if (!business) { toast('请填写商务', 'error'); return; }
   if (!product) { toast('请填写货品名称', 'error'); return; }
+  if (!shipDate) { toast('请选择发货日期', 'error'); return; }
 
   var btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = '提交中...';
@@ -700,6 +702,53 @@ function clearGithub() {
   document.getElementById('githubStatus').textContent = '💻 已切换为本地存储';
   showBadge('💻 本地');
   toast('已清除云配置', 'info');
+}
+
+// 按筛选结果导出（ERP模板格式）
+function exportFiltered() {
+  var shipDate = document.getElementById('filterShipDate').value;
+  if (!shipDate) { toast('请先选择发货日期再导出', 'error'); return; }
+
+  var filtered = data.submissions.filter(function(s) { return s.shipDate === shipDate; });
+  if (filtered.length === 0) { toast('该日期没有数据', 'error'); return; }
+
+  // ERP模板列
+  var headers = ['店铺名称','原始单号','收件人','省','市','区','手机','固话','邮编','网名','地址','发货条件','应收合计','已付金额','邮费','优惠金额','COD买家费用','仓库名称','物流公司','下单时间','付款时间','买家备注','客服备注','分销商','发票抬头','发票内容','支付方式','业务员','商家编码','货品数量'];
+
+  var rows = [headers];
+  filtered.forEach(function(item, idx) {
+    var orderNo = shipDate.replace(/-/g,'') + String(idx + 1).padStart(3,'0');
+    rows.push([
+      '店铺vitafolks',            // 店铺名称
+      orderNo,                     // 原始单号
+      item.name||'',               // 收件人
+      '', '', '',                  // 省 市 区
+      item.phone||'',              // 手机
+      '', '', '',                  // 固话 邮编 网名
+      item.address||'',            // 地址
+      '款到发货',                  // 发货条件
+      '0','0','0','0','0',         // 金额相关
+      '', '',                      // 仓库名称 物流公司
+      item.created_at||'',         // 下单时间
+      '',                          // 付款时间
+      item.description||'',        // 买家备注
+      '', '', '', '', '', '',      // 客服备注 分销商 发票抬头 发票内容 支付方式
+      item.business||'',           // 业务员
+      item.product||'',            // 商家编码
+      item.quantity||'1'           // 货品数量
+    ]);
+  });
+
+  var csv = rows.map(function(r) { return r.map(function(c) { return '"' + (c||'').replace(/"/g,'""') + '"'; }).join(','); }).join('\n');
+  var bom = '﻿';
+  var blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = '寄样_' + shipDate + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('已导出 ' + filtered.length + ' 条', 'success');
 }
 
 function exportData() {

@@ -234,7 +234,7 @@ select.form-control{-webkit-appearance:auto;appearance:auto}
 <input type="date" id="filterShipDate" style="padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--card);color:var(--text)">
 <button class="btn btn-sm btn-primary" onclick="applyDateFilter()" style="width:auto">筛选</button>
 <button class="btn btn-sm btn-outline" onclick="clearDateFilter()" style="width:auto">清除</button>
-<button class="btn btn-sm btn-success" onclick="exportFiltered()" style="width:auto"><span style="font-size:13px;color:var(--text2);font-weight:500;margin-left:8px">📞 手机号：</span><input type="tel" id="filterPhone" placeholder="输入手机号" style="padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--card);color:var(--text);width:150px" oninput="phoneFilterTimeout()"><button class="btn btn-sm btn-outline" onclick="clearPhoneFilter()" style="width:auto;margin-left:4px">清除</button>📦 导出发货报表</button>
+<span style="font-size:13px;color:var(--text2);font-weight:500">📞 手机号：</span><input type="tel" id="filterPhone" placeholder="输入手机号" style="padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:var(--card);color:var(--text);width:150px" oninput="phoneFilterTimeout()"><button class="btn btn-sm btn-outline" onclick="clearPhoneFilter()" style="width:auto;margin-left:4px">清除</button><button class="btn btn-sm btn-success" onclick="exportFiltered()" style="width:auto;margin-left:6px">📦 导出发货报表</button>
 <button class="btn btn-sm btn-primary" onclick="exportInfo()" style="width:auto">📋 导出信息报表</button>
 </div>
 <!-- CSV上传回传 -->

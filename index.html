@@ -177,9 +177,12 @@ select.form-control{-webkit-appearance:auto;appearance:auto}
 <span style="font-size:12px;color:var(--text2)">（点击展开）</span>
 </div>
 <div class="hidden" style="margin-top:10px">
-<div style="display:flex;gap:8px;margin-bottom:10px">
-<input type="tel" id="trackingPhone" class="form-control" placeholder="输入手机号查询" style="flex:1">
+<div style="display:flex;gap:8px;margin-bottom:6px">
+<input type="tel" id="trackingPhone" class="form-control" placeholder="输入手机号" style="flex:1">
 <button class="btn btn-sm btn-primary" onclick="queryTracking()" style="width:auto">查询</button>
+</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:8px;text-align:center">
+或 <input type="text" id="trackingName" placeholder="输入商务名搜索" style="border:none;border-bottom:1px solid var(--border);background:transparent;color:var(--text);font-size:12px;width:120px;outline:none;padding:2px 4px;" onkeydown="if(event.key==='Enter')queryTracking()">
 </div>
 <div id="trackingResult"></div>
 </div>
@@ -335,7 +338,7 @@ function esc(v){var s=String(v==null?'':v);return s.replace(/"/g,'""')}
 function toCsvVal(v){if(v===null||v===undefined)return'';if(typeof v==='number')return String(v);return'"'+esc(v)+'"'}
 
 // 快递查询 - 完整卡片样式
-function queryTracking(){var phone=document.getElementById('trackingPhone').value.trim();if(!phone){toast('请输入手机号','error');return}var list=document.getElementById('trackingResult');var items=data.submissions.filter(function(s){return s.phone===phone});if(items.length===0){list.innerHTML='<div style="text-align:center;padding:20px;color:var(--text2)">该手机号没有提交记录</div>';return}list.innerHTML='<div style="font-size:13px;font-weight:600;margin-bottom:8px">共 '+items.length+' 条记录</div>'+items.map(function(item){return renderUserCard(item)}).join('');toast('找到 '+items.length+' 条','success')}
+function queryTracking(){var phone=document.getElementById('trackingPhone').value.trim();var name=document.getElementById('trackingName').value.trim();if(!phone&&!name){toast('请输入手机号或商务名','error');return}var list=document.getElementById('trackingResult');var items=phone?data.submissions.filter(function(s){return s.phone===phone}):data.submissions.filter(function(s){return s.business&&s.business.indexOf(name)>=0});if(items.length===0){var hint=phone?'该手机号没有提交记录':'未找到匹配的商务名';list.innerHTML='<div style="text-align:center;padding:20px;color:var(--text2)">'+hint+'</div>';return}list.innerHTML='<div style="font-size:13px;font-weight:600;margin-bottom:8px">共 '+items.length+' 条记录</div>'+items.map(function(item){return renderUserCard(item)}).join('');toast('找到 '+items.length+' 条','success')}
 function renderUserCard(item){var hasTr=item.trackingNumber&&item.trackingNumber.trim();var st;if(item.status==='pending')st='<span class="status status-pending">⏳ 待审核</span>';else if(item.status==='approved'&&hasTr)st='<span class="status status-shipped">📦 已发货</span>';else if(item.status==='approved')st='<span class="status status-approved">✅ 已通过</span>';else st='<span class="status status-rejected">❌ 已拒绝</span>';var itemsDisplay=item.itemSummary?'<div class="info">📦 '+item.itemSummary+'</div>':'';var sfDisplay=item.isSF?'<div class="info">🚚 '+(item.isSF==='是'?'顺丰':'非顺丰')+'</div>':'';var ship=item.shipDate?'<div class="info">📅 '+item.shipDate+'</div>':'';var addr=item.address?'<div class="info">📍 '+item.address+'</div>':'';var orderNo='<div class="info" style="font-size:12px;color:#94a3b8">🆔 订单号:'+(item.orderNumber||'—')+'</div>';var trackingHtml='';if(hasTr){trackingHtml='<div class="info" style="color:#155e75">📮 <strong>'+item.trackingCompany+'</strong> '+item.trackingNumber+'</div>'}else if(item.status==='approved'){trackingHtml='<div class="info">⏳ 等待发货</div>'}return '<div class="sub-item"><div class="top"><span class="name">'+item.name+'</span>'+st+'</div>'+orderNo+'<div class="info">📞 '+item.phone+'</div>'+itemsDisplay+sfDisplay+ship+addr+trackingHtml+'<div class="time">🕐 '+item.created_at+'</div></div>'}
 
 // 手动更新快递单号（管理端单个录入）
